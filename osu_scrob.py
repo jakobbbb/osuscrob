@@ -96,6 +96,8 @@ def main():
             prev_scrobs.append(str(scrobble))
             prev_scrobs.append(score_id)
             print(scrobble)
+        else:
+            prev_scrobs.append(score_id)
 
     with open(prev_scrobs_path, "w+") as f:
         f.write("\n".join(prev_scrobs))
