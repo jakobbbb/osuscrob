@@ -78,8 +78,8 @@ def main():
     scrobbles = []
     for play in recent:
         beatmap_id = play["beatmap_id"]
-        score = play["score"]
-        if score == "F":
+        score = play["rank"]
+        if score == "F" or str(play) in prev_scrobs:
             continue
         beatmap = get_beatmap(**cfg, beatmap_id=beatmap_id)
         artist = beatmap["artist"]
@@ -94,6 +94,7 @@ def main():
         if str(scrobble) not in prev_scrobs:
             scrobbles.append(scrobble)
             prev_scrobs.append(str(scrobble))
+            prev_scrobs.append(str(play))
             print(scrobble)
 
     with open(prev_scrobs_path, "w+") as f:
