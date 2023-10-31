@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import yaml
+import re
 import os
 import requests
 import pylast
@@ -54,6 +55,11 @@ def get_beatmap(osu_api_key, beatmap_id, **_):
     return resp.json()[0]
 
 
+def filter_title(title):
+    r = re.compile(r"[ ]\(tv size\)", re.IGNORECASE)
+    return r.sub("", title)
+
+
 def main():
     cfg = load_config()
 
@@ -87,7 +93,7 @@ def main():
         time = play["date"]
         timestamp = parser.parse(time + " UTC").timestamp()
         scrobble = {
-            "title": title,
+            "title": filter_title(title),
             "artist": artist,
             "timestamp": timestamp,
         }
