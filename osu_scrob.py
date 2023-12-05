@@ -103,11 +103,11 @@ def main():
             prev_scrobs.append(str(play))
             print(scrobble)
 
-    with open(prev_scrobs_path, "w+") as f:
-        f.write("\n".join(prev_scrobs))
-
     print(f"Scrobbling {len(scrobbles)} tracks!")
     lastfm.scrobble_many(scrobbles)
+
+    with open(prev_scrobs_path, "w+") as f:
+        f.write("\n".join(prev_scrobs))
 
 
 if __name__ == "__main__":
