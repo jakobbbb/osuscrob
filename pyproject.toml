@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "osuscrob"
+version = "0.1.0"
+description = ""
+authors = ["Jakob Ruckel <jakob@ruckel.de>"]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.scripts]
+osuscrob = "osuscrob:osu_scrob.py"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pylast = "^5.2.0"
+python-dateutil = "^2.8.2"
+pyyaml = "^6.0.1"
+requests = "^2.31.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

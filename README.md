@@ -6,13 +6,11 @@
 fetches your recent osu~ plays and scrobbles them to last.fm
 (unless you ranked 'F')
 
-## python deps
-* `pylast`
-* `dateutil`
-
 ## setup
 
-run `./osu_scrob.py` once, then add everything to
+run `poetry install --no-root` to install dependencies
+
+run `poetry run osu_scrob.py` once, then add everything to
 `config.yml`.
 
 Notes:
