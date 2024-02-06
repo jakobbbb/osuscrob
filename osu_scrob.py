@@ -30,7 +30,7 @@ def load_config():
         print(f"Please configure in {CONFIG_PATH} :)")
         return None
     else:
-        with open(CONFIG_PATH, "r") as f:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
             return yaml.safe_load(f.read())
 
 
@@ -57,7 +57,7 @@ def check_config(cfg):
 
 
 def write_config(cfg):
-    with open(CONFIG_PATH, "w+") as f:
+    with open(CONFIG_PATH, "w+", encoding="utf-8") as f:
         f.write(yaml.dump(cfg, sort_keys=True))
 
 
@@ -88,7 +88,7 @@ def main():
     prev_scrobs_path = os.path.join(script_dir, "prev_scrobs.lst")
     prev_scrobs = []
     if os.path.exists(prev_scrobs_path):
-        with open(prev_scrobs_path, "r") as f:
+        with open(prev_scrobs_path, "r", encoding="utf-8") as f:
             prev_scrobs = f.read().splitlines()
 
     if cfg is None:
@@ -128,7 +128,7 @@ def main():
     print(f"Scrobbling {len(scrobbles)} tracks!")
     lastfm.scrobble_many(scrobbles)
 
-    with open(prev_scrobs_path, "w+") as f:
+    with open(prev_scrobs_path, "w+", encoding="utf-8") as f:
         f.write("\n".join(prev_scrobs))
 
 
