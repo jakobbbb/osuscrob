@@ -198,6 +198,53 @@ files = [
 ]
 
 [[package]]
+name = "oauthlib"
+version = "3.2.2"
+description = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "oauthlib-3.2.2-py3-none-any.whl", hash = "sha256:8139f29aac13e25d502680e9e19963e83f16838d48a0d71c287fe40e7067fbca"},
+    {file = "oauthlib-3.2.2.tar.gz", hash = "sha256:9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918"},
+]
+
+[package.extras]
+rsa = ["cryptography (>=3.0.0)"]
+signals = ["blinker (>=1.4.0)"]
+signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
+
+[[package]]
+name = "osrparse"
+version = "6.0.2"
+description = "Parser for osr files and lzma replay streams for osu!"
+optional = false
+python-versions = "*"
+files = [
+    {file = "osrparse-6.0.2-py3-none-any.whl", hash = "sha256:fb80796621d0c1c2f4ff53d6a0468cf5cec9b11c5e01d479f170bdfd00549044"},
+    {file = "osrparse-6.0.2.tar.gz", hash = "sha256:7415faee6d2eeabb29dbd85b3a15c4ac960a6b5acb7b757ff503f215e7ef7ebb"},
+]
+
+[[package]]
+name = "ossapi"
+version = "3.4.3"
+description = "Complete python wrapper for osu! api v2 and v1."
+optional = false
+python-versions = "*"
+files = [
+    {file = "ossapi-3.4.3-py3-none-any.whl", hash = "sha256:80b625dc46573fcced6fe0439f4087f523399994ca90db342279c76719b5e2f6"},
+    {file = "ossapi-3.4.3.tar.gz", hash = "sha256:6b6868265c1dca4ebfbba7341588bb6fa80a72043aac893943e347a0f68f1a30"},
+]
+
+[package.dependencies]
+osrparse = ">=6.0,<7.0"
+requests = "*"
+requests-oauthlib = "*"
+typing-utils = "*"
+
+[package.extras]
+async = ["aiohttp"]
+
+[[package]]
 name = "pylast"
 version = "5.2.0"
 description = "A Python interface to Last.fm and Libre.fm"
@@ -310,6 +357,24 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "requests-oauthlib"
+version = "1.3.1"
+description = "OAuthlib authentication support for Requests."
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+files = [
+    {file = "requests-oauthlib-1.3.1.tar.gz", hash = "sha256:75beac4a47881eeb94d5ea5d6ad31ef88856affe2332b9aafb52c6452ccf0d7a"},
+    {file = "requests_oauthlib-1.3.1-py2.py3-none-any.whl", hash = "sha256:2577c501a2fb8d05a304c09d090d6e47c306fef15809d102b327cf8364bddab5"},
+]
+
+[package.dependencies]
+oauthlib = ">=3.0.0"
+requests = ">=2.0.0"
+
+[package.extras]
+rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -332,6 +397,20 @@ files = [
 ]
 
 [[package]]
+name = "typing-utils"
+version = "0.1.0"
+description = "utils to inspect Python type annotations"
+optional = false
+python-versions = ">=3.6.1"
+files = [
+    {file = "typing_utils-0.1.0-py3-none-any.whl", hash = "sha256:6bd26f3d38a5dd526ca3a59f0a451ccb59bcee9dc829c872dd6c0aae4ec8bbef"},
+    {file = "typing_utils-0.1.0.tar.gz", hash = "sha256:8ff6b6705414b82575ad5ae0925ac414a9650fb8c5718289b1327dec61252f65"},
+]
+
+[package.extras]
+test = ["pytest"]
+
+[[package]]
 name = "urllib3"
 version = "2.2.0"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -351,4 +430,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "10c230e96c84911bf725735997ab3bd593450d9394781a0dbbff492e89492afd"
+content-hash = "2f4515240568597f855ef1d4e4847cd7d662c158b2ebb17d527b518b9c764500"

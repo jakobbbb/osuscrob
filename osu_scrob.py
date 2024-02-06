@@ -1,58 +1,76 @@
 #!/usr/bin/env python3
 
+from ossapi.models import Beatmapset, Score, Grade
 import yaml
 import re
 import os
 import requests
 import pylast
-from dateutil import parser
+from ossapi import Ossapi, Domain
+from typing import List
 
 CONFIG = {
-    "osu_api_key": "",
+    "osu_client_id": "",
+    "osu_client_secret": "",
     "osu_user": "",
+    "osu_lazer": False,
     "lastfm_api_key": "",
     "lastfm_shared_secret": "",
     "lastfm_user": "",
     "lastfm_pass": "",
 }
 
+SCRIPT_DIR = os.path.realpath(os.path.dirname(__file__))
+CONFIG_PATH = os.path.join(SCRIPT_DIR, "config.yml")
+
 
 def load_config():
-    script_dir = os.path.realpath(os.path.dirname(__file__))
-    config_path = os.path.join(script_dir, "config.yml")
-    if not os.path.exists(config_path):
-        with open(config_path, "w+") as f:
-            f.write(yaml.dump(CONFIG, sort_keys=True))
-            print(f"Please configure in {config_path} :)")
-            return None
+    if not os.path.exists(CONFIG_PATH):
+        write_config(CONFIG)
+        print(f"Please configure in {CONFIG_PATH} :)")
+        return None
     else:
-        with open(config_path, "r") as f:
+        with open(CONFIG_PATH, "r") as f:
             return yaml.safe_load(f.read())
 
 
-def get_recent(osu_api_key, osu_user, **_):
-    base = "https://osu.ppy.sh/api"
-    endpoint = "/get_user_recent"
-    params = {
-        "k": osu_api_key,
-        "u": osu_user,
-        "limit": 50,
-    }
+def check_config(cfg):
+    keys_missing = set(CONFIG.keys()) - set(cfg.keys())
+    if len(keys_missing) > 0:
+        print("Missing the following config keys:")
+        for k in keys_missing:
+            print(f"  - {k}")
+            cfg[k] = CONFIG[k]
+        write_config(cfg)
+        return False
 
-    resp = requests.get(base + endpoint, params=params)
-    return resp.json()
+    keys_empty = []
+    for k, v in cfg.items():
+        if v is None or len(str(v)) == 0:
+            keys_empty.append(k)
+    if len(keys_empty) > 0:
+        print("The following config options must not be empty:")
+        [print(f"  - {k}") for k in keys_empty]
+        return False
+
+    return True
 
 
-def get_beatmap(osu_api_key, beatmap_id, **_):
-    base = "https://osu.ppy.sh/api"
-    endpoint = "/get_beatmaps"
-    params = {
-        "k": osu_api_key,
-        "b": beatmap_id,
-    }
+def write_config(cfg):
+    with open(CONFIG_PATH, "w+") as f:
+        f.write(yaml.dump(cfg, sort_keys=True))
 
-    resp = requests.get(base + endpoint, params=params)
-    return resp.json()[0]
+
+def get_recent(api, osu_user, **_) -> List[Score]:
+    user_id = api.user(osu_user).id
+    recent = api.user_scores(
+        user_id=user_id, limit=50, include_fails=False, type="recent"
+    )
+    return recent
+
+
+def get_beatmap(api: Ossapi, beatmap) -> Beatmapset:
+    return api.beatmapset(beatmap)
 
 
 def filter_title(title):
@@ -62,6 +80,9 @@ def filter_title(title):
 
 def main():
     cfg = load_config()
+    if not check_config(cfg):
+        print(f"Please fix the config ({CONFIG_PATH}) and re-run :>")
+        return 1
 
     script_dir = os.path.realpath(os.path.dirname(__file__))
     prev_scrobs_path = os.path.join(script_dir, "prev_scrobs.lst")
@@ -80,18 +101,19 @@ def main():
         password_hash=pylast.md5(cfg["lastfm_pass"]),
     )
 
-    recent = get_recent(**cfg)
+    domain = Domain.LAZER if cfg["osu_lazer"] else Domain.OSU
+    api = Ossapi(cfg["osu_client_id"], cfg["osu_client_secret"], domain=domain)
+
+    recent = get_recent(api, **cfg)
     scrobbles = []
     for play in recent:
-        beatmap_id = play["beatmap_id"]
-        score = play["rank"]
-        if score == "F" or str(play) in prev_scrobs:
+        if play.rank == Grade.F or str(play) in prev_scrobs:
             continue
-        beatmap = get_beatmap(**cfg, beatmap_id=beatmap_id)
-        artist = beatmap["artist"]
-        title = beatmap["title"]
-        time = play["date"]
-        timestamp = parser.parse(time + " UTC").timestamp()
+        if play.beatmapset is None:
+            continue
+        artist = play.beatmapset.artist
+        title = play.beatmapset.title
+        timestamp = play.created_at.timestamp()
         scrobble = {
             "title": filter_title(title),
             "artist": artist,
