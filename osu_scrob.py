@@ -113,6 +113,8 @@ def main():
             continue
         artist = play.beatmapset.artist
         title = play.beatmapset.title
+        if play.beatmapset.title_unicode:
+            title = play.beatmapset.title_unicode
         timestamp = play.created_at.timestamp()
         scrobble = {
             "title": filter_title(title),
