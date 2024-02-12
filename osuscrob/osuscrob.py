@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from ossapi.models import Beatmapset, Score, Grade
+import json
 import yaml
 import re
 import os
@@ -27,7 +28,7 @@ class OsuScrob:
         if not os.path.exists(self.dir):
             os.mkdir(self.dir)
 
-        self.prev_scrobs_path = os.path.join(self.dir, "prev_scrobs.lst")
+        self.prev_scrobs_path = os.path.join(self.dir, "prev_scrobs.jsonl")
         self.config_path = os.path.join(self.dir, "config.yml")
 
         self.cfg = self.load_config()
@@ -142,8 +143,12 @@ class OsuScrob:
             }
             if str(scrobble) not in self.prev_scrobs:
                 scrobbles.append(scrobble)
-                self.prev_scrobs.append(str(scrobble))
-                self.prev_scrobs.append(str(play))
+                p = {
+                    "score_id": play.id,
+                    "beatmapset": play.beatmapset.id,
+                }
+                p.update(scrobble)
+                self.prev_scrobs.append(json.dumps(p, sort_keys=True))
                 print(scrobble)
 
         print(f"Scrobbling {len(scrobbles)} tracks!")
