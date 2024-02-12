@@ -6,7 +6,7 @@ import yaml
 import re
 import os
 import pylast
-from ossapi import Ossapi, Domain
+from ossapi import Domain, Ossapi
 from typing import List
 from platformdirs import user_config_dir
 
@@ -14,16 +14,16 @@ CONFIG = {
     "osu_client_id": "",
     "osu_client_secret": "",
     "osu_user": "",
-    "osu_lazer": False,
     "lastfm_api_key": "",
     "lastfm_shared_secret": "",
     "lastfm_user": "",
     "lastfm_pass": "",
+    "prefer_native": True,
 }
 
 
 class OsuScrob:
-    def __init__(self):
+    def init(self):
         self.dir = user_config_dir(appname="osuscrob")
         if not os.path.exists(self.dir):
             os.mkdir(self.dir)
@@ -33,9 +33,8 @@ class OsuScrob:
 
         self.cfg = self.load_config()
         if not self.check_config(self.cfg):
-            raise Exception(
-                (f"Please fix the config ({self.config_path}) and re-run :>")
-            )
+            print(f"Please fix the config ({self.config_path}) and re-run :>")
+            return False
 
         self.prev_scrobs = []
         if os.path.exists(self.prev_scrobs_path):
@@ -45,6 +44,8 @@ class OsuScrob:
         assert self.cfg
         self.init_lastfm_api(**self.cfg)
         self.init_osu_api(**self.cfg)
+
+        return True
 
     def load_config(self):
         if not os.path.exists(self.config_path):
@@ -100,11 +101,10 @@ class OsuScrob:
     def init_osu_api(self, osu_client_id, osu_client_secret, **_):
         assert self.cfg
 
-        domain = Domain.LAZER if self.cfg["osu_lazer"] else Domain.OSU
         self.osu = Ossapi(
             osu_client_id,
             osu_client_secret,
-            domain=domain,
+            domain=Domain.OSU,
         )
 
     def get_recent(self, api, osu_user, **_) -> List[Score]:
@@ -127,31 +127,36 @@ class OsuScrob:
         recent = self.get_recent(self.osu, **self.cfg)
         scrobbles = []
         for play in recent:
-            if play.rank == Grade.F or str(play) in self.prev_scrobs:
-                continue
-            if play.beatmapset is None:
+            if play.rank == Grade.F or play.beatmapset is None:
                 continue
             artist = play.beatmapset.artist
             title = play.beatmapset.title
-            if play.beatmapset.title_unicode:
-                title = play.beatmapset.title_unicode
+            if self.cfg["prefer_native"]:
+                if play.beatmapset.title_unicode:
+                    title = play.beatmapset.title_unicode
+                if play.beatmapset.artist_unicode:
+                    artist = play.beatmapset.artist_unicode
             timestamp = play.created_at.timestamp()
+            title = self.filter_title(title)
             scrobble = {
-                "title": self.filter_title(title),
+                "title": title,
                 "artist": artist,
                 "timestamp": timestamp,
             }
             if str(scrobble) not in self.prev_scrobs:
-                scrobbles.append(scrobble)
                 p = {
                     "score_id": play.id,
                     "beatmapset": play.beatmapset.id,
                 }
                 p.update(scrobble)
-                self.prev_scrobs.append(json.dumps(p, sort_keys=True))
-                print(scrobble)
+                scrobble_json = json.dumps(p, sort_keys=True)
+                if scrobble_json in self.prev_scrobs:
+                    continue
+                scrobbles.append(scrobble)
+                self.prev_scrobs.append(scrobble_json)
+                print(f"Will scrobble:  {artist} - {title}")
 
-        print(f"Scrobbling {len(scrobbles)} tracks!")
+        print(f"Scrobbling {len(scrobbles)} tracks :3")
         self.lastfm.scrobble_many(scrobbles)
 
         with open(self.prev_scrobs_path, "w+", encoding="utf-8") as f:
@@ -159,7 +164,9 @@ class OsuScrob:
 
 
 def main():
-    return OsuScrob().main()
+    o = OsuScrob()
+    if o.init():
+        o.main()
 
 
 if __name__ == "__main__":
