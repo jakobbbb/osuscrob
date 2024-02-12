@@ -9,6 +9,7 @@ packages = [{include = "osuscrob"}]
 
 [tool.poetry.scripts]
 osuscrob = "osuscrob.osuscrob:main"
+osuscrob-ui = "osuscrob.ui:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -18,6 +19,7 @@ pyyaml = "^6.0.1"
 requests = "^2.31.0"
 ossapi = "^3.4.3"
 platformdirs = "^4.2.0"
+flask = "^3.0.2"
 
 [build-system]
 requires = ["poetry-core"]
