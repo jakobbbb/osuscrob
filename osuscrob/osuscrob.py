@@ -7,6 +7,7 @@ import os
 import pylast
 from ossapi import Ossapi, Domain
 from typing import List
+from platformdirs import user_config_dir
 
 CONFIG = {
     "osu_client_id": "",
@@ -22,7 +23,7 @@ CONFIG = {
 
 class OsuScrob:
     def __init__(self):
-        self.dir = os.path.expanduser("~/.config/osuscrob")
+        self.dir = user_config_dir(appname="osuscrob")
         if not os.path.exists(self.dir):
             os.mkdir(self.dir)
 
