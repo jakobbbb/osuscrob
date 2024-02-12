@@ -78,7 +78,7 @@ def filter_title(title):
     return r.sub("", title)
 
 
-def main():
+def _main():
     cfg = load_config()
     if not check_config(cfg):
         print(f"Please fix the config ({CONFIG_PATH}) and re-run :>")
@@ -132,6 +132,10 @@ def main():
 
     with open(prev_scrobs_path, "w+", encoding="utf-8") as f:
         f.write("\n".join(prev_scrobs))
+
+
+def main():
+    print("uwu")
 
 
 if __name__ == "__main__":

@@ -5,10 +5,10 @@ description = ""
 authors = ["Jakob Ruckel <jakob@ruckel.de>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
-packages = [{include = "src"}]
+packages = [{include = "osuscrob"}]
 
 [tool.poetry.scripts]
-osuscrob = "osuscrob:osu_scrob.py"
+osuscrob = "osuscrob.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
