@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{include = "osuscrob"}]
 
 [tool.poetry.scripts]
-osuscrob = "osuscrob.main:main"
+osuscrob = "osuscrob.osuscrob:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
