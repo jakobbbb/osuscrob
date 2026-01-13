@@ -23,8 +23,12 @@ CONFIG = {
 
 
 class OsuScrob:
-    def init(self):
-        self.dir = user_config_dir(appname="osuscrob")
+    def init(self, config_dir=None):
+        if config_dir is not None:
+            self.dir = config_dir
+        else:
+            self.dir = user_config_dir(appname="osuscrob")
+
         if not os.path.exists(self.dir):
             os.mkdir(self.dir)
 
@@ -57,6 +61,9 @@ class OsuScrob:
                 return yaml.safe_load(f.read())
 
     def check_config(self, cfg):
+        if self.cfg is None:
+            return False
+
         keys_missing = set(CONFIG.keys()) - set(cfg.keys())
         if len(keys_missing) > 0:
             print("Missing the following config keys:")

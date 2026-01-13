@@ -1,0 +1,1 @@
+from .osuscrob import OsuScrob
